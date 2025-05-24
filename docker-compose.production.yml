@@ -26,7 +26,7 @@ services:
       - static_volume:/frontend_static
 
   gateway:
-    image: hayko19/kittygram_nginx
+    image: hayko19/kittygram_gateway
     env_file: .env
     ports:
       - 9000:80
