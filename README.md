@@ -1,26 +1,72 @@
-#  Как работать с репозиторием финального задания
+# Kittygram
 
-## Что нужно сделать
+Веб-приложение для публикации карточек с животными (кошки). Проект включает backend на Django (REST API) и frontend на React. Репозиторий содержит Docker-конфигурацию для быстрой локальной разработки и развёртывания.
 
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
+## Основные возможности
 
-## Как проверить работу с помощью автотестов
+- Регистрация и авторизация пользователей (через REST API).
+- CRUD операций с карточками животных (создание, редактирование, удаление, список).
+- Загрузка и хранение изображений (в `media/`).
+- Подготовка к развёртыванию через Docker + Nginx.
 
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
+## Стек
+
+* Python 3.9, Django, Django REST Framework, Gunicorn
+* SQLite (dev), PostgreSQL (prod)
+* React (CRA), JavaScript (ES6+), npm
+* Docker, Docker Compose, Nginx
+* pytest, ESLint, Prettier
+
+## Быстрый старт (Docker)
+
+Проще всего запустить приложение с помощью Docker Compose — это создаст и запустит backend, frontend и (опционально) nginx.
+
+1) Скопируйте `.env` при необходимости и настройте параметры (например, секретный ключ Django, настройки БД и т.п.).
+
+2) Соберите и запустите контейнеры:
+
+```bash
+docker-compose up --build
 ```
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
+После успешного запуска:
+- Backend будет доступен по адресу http://localhost:8000/ (если в `docker-compose.yml` указан проброс 8000).
+- Frontend — http://localhost:3000/ (или сконфигурированному порту).
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
+Для production-сборки используйте `docker-compose.production.yml`.
 
-## Чек-лист для проверки перед отправкой задания
+## Переменные окружения
 
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+Файлы и переменные, которые стоит задать:
+
+- `.env` — основной файл с настройками окружения для Docker/compose.
+- Для backend (Django) обычно требуются: `SECRET_KEY`, `DJANGO_DEBUG`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`.
+- Для frontend — переменные окружения, начинающиеся с `REACT_APP_`, при необходимости указывающие URL API.
+
+Примерно `.env` может выглядеть так (не храните секреты в репозиториях):
+
+```
+SECRET_KEY=changeme
+DB_NAME=kittygram
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
+```
+
+## Развёртывание
+
+Рекомендации для production:
+
+- Используйте `docker-compose.production.yml` и собирайте статические файлы для backend (`collectstatic`).
+- Настройте безопасное хранение секретов и переменных окружения (Vault, Kubernetes Secrets, или CI/CD secrets).
+- Используйте nginx в качестве прокси и для отдачи статических файлов.
+
+Примерная последовательность:
+
+```bash
+docker-compose -f docker-compose.production.yml up --build -d
+```
+
+**Путь к репозиторию:**  
+https://github.com/Hayko19/Kittygram
